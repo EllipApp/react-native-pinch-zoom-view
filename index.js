@@ -9,11 +9,19 @@ export default class PinchZoomView extends Component {
 
   static propTypes = {
     ...View.propTypes,
-    scalable: PropTypes.bool
+    scalable: PropTypes.bool,
+    minActiveTouchesZoom: PropTypes.number,
+    maxActiveTouchesZoom: PropTypes.number,
+    minActiveTouchesTranslate: PropTypes.number,
+    maxActiveTouchesTranslate: PropTypes.number,
   };
 
   static defaultProps = {
-    scalable: true
+    scalable: true,
+    minActiveTouchesZoom: 2,
+    maxActiveTouchesZoom: 2,
+    minActiveTouchesTranslate: 1,
+    maxActiveTouchesTranslate: 1,
   };
 
   constructor(props) {
@@ -51,7 +59,7 @@ export default class PinchZoomView extends Component {
   }
 
   _handlePanResponderGrant = (e, gestureState) => {
-    if (gestureState.numberActiveTouches === 2) {
+    if (gestureState.numberActiveTouches >= this.props.minActiveTouchesZoom && gestureState.numberActiveTouches <= this.props.maxActiveTouchesZoom) {
       let dx = Math.abs(e.nativeEvent.touches[0].pageX - e.nativeEvent.touches[1].pageX);
       let dy = Math.abs(e.nativeEvent.touches[0].pageY - e.nativeEvent.touches[1].pageY);
       let distant = Math.sqrt(dx * dx + dy * dy);
@@ -68,19 +76,24 @@ export default class PinchZoomView extends Component {
   }
 
   _handlePanResponderMove = (e, gestureState) => {
+    let updates = {};
     // zoom
-    if (gestureState.numberActiveTouches === 2) {
+    if (gestureState.numberActiveTouches >= this.props.minActiveTouchesZoom && gestureState.numberActiveTouches <= this.props.maxActiveTouchesZoom) {
       let dx = Math.abs(e.nativeEvent.touches[0].pageX - e.nativeEvent.touches[1].pageX);
       let dy = Math.abs(e.nativeEvent.touches[0].pageY - e.nativeEvent.touches[1].pageY);
       let distant = Math.sqrt(dx * dx + dy * dy);
       let scale = distant / this.distant * this.state.lastScale;
-      this.setState({ scale });
+      updates = Object.assign(updates, {}, {scale});
     }
     // translate
-    else if (gestureState.numberActiveTouches === 1) {
+    if (gestureState.numberActiveTouches >= this.props.maxActiveTouchesTranslate && gestureState.numberActiveTouches <= this.props.maxActiveTouchesTranslate) {
       let offsetX = this.state.lastX + gestureState.dx / this.state.scale;
       let offsetY = this.state.lastY + gestureState.dy / this.state.scale;
-      this.setState({ offsetX, offsetY });
+      updates = Object.assign(updates, {}, {offsetX, offsetY});
+    }
+
+    if(updates) {
+      this.setState(updates)
     }
   }
 
