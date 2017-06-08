@@ -10,7 +10,9 @@ export default class PinchZoomView extends Component {
   static propTypes = {
     ...View.propTypes,
     scalable: PropTypes.bool,
+    onMoveStart: PropTypes.func,
     onMove: PropTypes.func,
+    onMoveEnd: PropTypes.func,
     minActiveTouchesZoom: PropTypes.number,
     maxActiveTouchesZoom: PropTypes.number,
     minActiveTouchesTranslate: PropTypes.number,
@@ -19,7 +21,9 @@ export default class PinchZoomView extends Component {
 
   static defaultProps = {
     scalable: true,
+    onMoveStart: () => {},
     onMove: () => {},
+    onMoveEnd: () => {},
     minActiveTouchesZoom: 2,
     maxActiveTouchesZoom: 2,
     minActiveTouchesTranslate: 1,
@@ -62,6 +66,7 @@ export default class PinchZoomView extends Component {
 
   _handlePanResponderGrant = (e, gestureState) => {
     if (gestureState.numberActiveTouches >= this.props.minActiveTouchesZoom && gestureState.numberActiveTouches <= this.props.maxActiveTouchesZoom) {
+      this.props.onMoveStart(e, gestureState);
       let dx = Math.abs(e.nativeEvent.touches[0].pageX - e.nativeEvent.touches[1].pageX);
       let dy = Math.abs(e.nativeEvent.touches[0].pageY - e.nativeEvent.touches[1].pageY);
       let distant = Math.sqrt(dx * dx + dy * dy);
@@ -75,6 +80,8 @@ export default class PinchZoomView extends Component {
       lastY: this.state.offsetY,
       lastScale: this.state.scale
     });
+
+    this.props.onMoveEnd(e, gestureState);
   }
 
   _handlePanResponderMove = (e, gestureState) => {
