@@ -19,7 +19,7 @@ export default class PinchZoomView extends Component {
 
   static defaultProps = {
     scalable: true,
-    onUpdate: () => {},
+    onMove: () => {},
     minActiveTouchesZoom: 2,
     maxActiveTouchesZoom: 2,
     minActiveTouchesTranslate: 1,
@@ -96,7 +96,7 @@ export default class PinchZoomView extends Component {
 
     if(updates) {
       this.setState(updates);
-      this.props.onUpdate(updates);
+      this.props.onMove(updates);
     }
   }
 
