@@ -71,8 +71,8 @@ export default class PinchZoomView extends Component {
 
   _handlePanResponderEnd = (e, gestureState) => {
     this.setState({
-      lastX: this.state.offsetX, 
-      lastY: this.state.offsetY, 
+      lastX: this.state.offsetX,
+      lastY: this.state.offsetY,
       lastScale: this.state.scale
     });
   }
@@ -94,7 +94,7 @@ export default class PinchZoomView extends Component {
       updates = Object.assign(updates, {}, {offsetX, offsetY});
     }
 
-    if(updates) {
+    if(Object.keys(updates).length) {
       this.setState(updates);
       this.props.onMove(updates);
     }
